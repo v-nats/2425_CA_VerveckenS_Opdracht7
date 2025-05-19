@@ -1,95 +1,76 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client';
+
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 export default function Home() {
-  return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.js</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [stations, setStations] = useState([]);
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+  useEffect(() => {
+    fetch('https://api.citybik.es/v2/networks/velo-antwerpen')
+      .then(res => res.json())
+      .then(data => {
+        // Selecteer 3 specifieke stations of de eerste 3
+        const selectie = data.network.stations.slice(0, 3);
+        setStations(selectie);
+      });
+  }, []);
+
+  return (
+    <main
+      style={{
+        padding: 20,
+        maxWidth: 480,
+        margin: '0 auto',
+        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+      }}
+    >
+      <h1 style={{ fontSize: 28, marginBottom: 10 }}>Velo Antwerpen</h1>
+      <p style={{ fontSize: 16, color: '#555', marginBottom: 30 }}>
+        Creatieve stadsvisualisatie – klik op een station
+      </p>
+
+      <section
+        style={{
+          display: 'flex',
+          justifyContent: 'space-around',
+          alignItems: 'flex-end',
+          height: 240,
+          marginBottom: 40,
+        }}
+      >
+        {stations.map((station) => {
+          const maxBikes = 20;
+          const intensity = 1 - Math.min(station.free_bikes / maxBikes, 1); // minder fietsen → meer intensiteit
+          const height = 60 + intensity * 140; // hoogte 60–200px
+          const color = `hsl(${intensity * 0 + (1 - intensity) * 120}, 80%, 50%)`; // rood → groen
+
+          return (
+            <Link
+              key={station.id}
+              href={`/station/${station.id}`}
+              style={{
+                textAlign: 'center',
+                textDecoration: 'none',
+                color: '#333',
+              }}
+            >
+              <div
+                style={{
+                  backgroundColor: color,
+                  height,
+                  width: 70,
+                  borderRadius: '0 0 35px 35px',
+                  margin: '0 auto',
+                  transition: 'all 0.3s ease',
+                  boxShadow: `0 4px 12px rgba(0,0,0,0.2)`,
+                }}
+              ></div>
+              <p style={{ marginTop: 10, fontSize: 14 }}>{station.name}</p>
+            </Link>
+          );
+        })}
+      </section>
+    </main>
   );
 }
