@@ -1,76 +1,73 @@
-'use client';
+// app/page.js
+'use client'; // Dit bestand MOET aan de client-side worden gerenderd
 
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic'; // Importeer next/dynamic voor client-side only rendering
 
+// Dynamische import van de VeloHeatmap component
+const DynamicVeloHeatmap = dynamic(() => import('./components/VeloHeatmap'), {
+  ssr: false, // Schakel Server-Side Rendering uit voor deze component
+  loading: () => <p>Kaart aan het laden...</p>, // Optionele laadtekst terwijl de kaart laadt
+});
+
+// Hoofdcomponent van de pagina
 export default function Home() {
   const [stations, setStations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
+    // Haal de data op van de Velo Antwerpen API
     fetch('https://api.citybik.es/v2/networks/velo-antwerpen')
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+      })
       .then(data => {
-        // Selecteer 3 specifieke stations of de eerste 3
-        const selectie = data.network.stations.slice(0, 3);
-        setStations(selectie);
+        // --- WIJZIGING HIER: FILTER VOOR SLECHTS 5 STATIONS ---
+        // We nemen hier de eerste 5 stations uit de API-respons.
+        // Als je specifieke stations wilt, kun je hier filters toevoegen op basis van ID of naam.
+        const firstFiveStations = data.network.stations.slice(0, 5);
+        setStations(firstFiveStations);
+        // --- EINDE WIJZIGING ---
+
+        setLoading(false);
+      })
+      .catch(e => {
+        console.error('Error fetching data:', e); // Log de fout voor debugging
+        setError(e.message);
+        setLoading(false);
       });
-  }, []);
+  }, []); // Lege dependency array betekent dat dit effect slechts één keer draait bij mount
 
   return (
     <main
       style={{
-        padding: 20,
-        maxWidth: 480,
+        padding: '20px',
+        maxWidth: '1200px',
         margin: '0 auto',
         fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '20px'
       }}
     >
-      <h1 style={{ fontSize: 28, marginBottom: 10 }}>Velo Antwerpen</h1>
-      <p style={{ fontSize: 16, color: '#555', marginBottom: 30 }}>
-        Creatieve stadsvisualisatie – klik op een station
+      <h1 style={{ fontSize: '28px', marginBottom: '0' }}>Velo Antwerpen Heatmap</h1>
+      <p style={{ fontSize: '16px', color: '#555', marginBottom: '20px', textAlign: 'center' }}>
+        Visualisatie van real-time beschikbare Velo fietsen. Groen = veel fietsen, Rood = weinig fietsen.
       </p>
 
-      <section
-        style={{
-          display: 'flex',
-          justifyContent: 'space-around',
-          alignItems: 'flex-end',
-          height: 240,
-          marginBottom: 40,
-        }}
-      >
-        {stations.map((station) => {
-          const maxBikes = 20;
-          const intensity = 1 - Math.min(station.free_bikes / maxBikes, 1); // minder fietsen → meer intensiteit
-          const height = 60 + intensity * 140; // hoogte 60–200px
-          const color = `hsl(${intensity * 0 + (1 - intensity) * 120}, 80%, 50%)`; // rood → groen
+      {loading && <p>Bezig met laden van Velo Antwerpen data...</p>}
+      {error && <p style={{ color: 'red' }}>Fout bij het laden van data: {error}</p>}
 
-          return (
-            <Link
-              key={station.id}
-              href={`/station/${station.id}`}
-              style={{
-                textAlign: 'center',
-                textDecoration: 'none',
-                color: '#333',
-              }}
-            >
-              <div
-                style={{
-                  backgroundColor: color,
-                  height,
-                  width: 70,
-                  borderRadius: '0 0 35px 35px',
-                  margin: '0 auto',
-                  transition: 'all 0.3s ease',
-                  boxShadow: `0 4px 12px rgba(0,0,0,0.2)`,
-                }}
-              ></div>
-              <p style={{ marginTop: 10, fontSize: 14 }}>{station.name}</p>
-            </Link>
-          );
-        })}
-      </section>
+      {/* Render de dynamisch geladen kaartcomponent zodra data is geladen en er geen fout is */}
+      {!loading && !error && (
+        <DynamicVeloHeatmap stations={stations} />
+      )}
+
     </main>
   );
 }
