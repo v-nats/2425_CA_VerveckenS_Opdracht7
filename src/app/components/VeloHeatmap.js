@@ -32,11 +32,12 @@ function HeatmapLayer({ heatmapData }) {
     const heatLayer = L.heatLayer(heatmapData, {
         radius: 80,
         blur: 20,
-        maxZoom: 12,
+        maxZoom: 1,
         minOpacity: 0.4,
         max: 1, // Blijft op 1
         gradient: {
-          0.0: 'red',     // 0-20% van max (0-4 fietsen)
+          0.0: 'red', 
+            // 0-20% van max (0-4 fietsen)
           0.3: 'orange',  // 30% van max (6 fietsen)
           0.6: 'yellow',  // 60% van max (12 fietsen)
           0.9: 'green'    // 90% van max (18 fietsen)
@@ -81,8 +82,8 @@ const VeloHeatmap = ({ stations }) => {
       className="leaflet-container" // Gebruikt de CSS class vanuit globals.css
     >
      <TileLayer
-  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-  url="https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png"
+  attribution="" // Geen attributie nodig voor een lege tegel
+  url="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" // Transparante 1x1 GIF
 />
 
       {/* Render de HeatmapLayer component met de voorbereide data */}
