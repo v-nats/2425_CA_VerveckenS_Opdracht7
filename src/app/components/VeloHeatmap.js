@@ -30,16 +30,18 @@ function HeatmapLayer({ heatmapData }) {
     }
 
     const heatLayer = L.heatLayer(heatmapData, {
-      radius: 25,
-      blur: 15,
-      maxZoom: 17,
-      minOpacity: 0.5,
-      gradient: {
-        0.0: 'red',
-        0.5: 'yellow',
-        1.0: 'green'
-      }
-    });
+        radius: 80,
+        blur: 20,
+        maxZoom: 12,
+        minOpacity: 0.4,
+        max: 1, // Blijft op 1
+        gradient: {
+          0.0: 'red',     // 0-20% van max (0-4 fietsen)
+          0.3: 'orange',  // 30% van max (6 fietsen)
+          0.6: 'yellow',  // 60% van max (12 fietsen)
+          0.9: 'green'    // 90% van max (18 fietsen)
+        }
+      });
 
     heatLayer.addTo(map);
     map._heatmapLayer = heatLayer; // Sla de laag op in de map instantie voor eenvoudige referentie
@@ -61,14 +63,16 @@ const VeloHeatmap = ({ stations }) => {
   const initialZoom = 13;
 
   const heatmapData = useMemo(() => {
-    const maxBikesPerStation = 20;
+    const maxBikesPerStation = 19; // pas aan indien nodig
     return stations.map(station => {
-      const freeBikesRatio = station.free_bikes / maxBikesPerStation;
-      const intensity = Math.min(freeBikesRatio, 1);
+      const ratio = station.free_bikes / maxBikesPerStation;
+      const intensity = Math.min(ratio, 1); // cap op 1
+      console.log(`Station: ${station.name}, Free Bikes: ${station.free_bikes}, Intensity: ${intensity}`); // <--- VOEG DEZE TOE
       return [station.latitude, station.longitude, intensity];
     });
+    console.log('Final Heatmap Data:', transformedData); // <--- EN DEZE
   }, [stations]);
-
+  
   return (
     <MapContainer
       center={defaultAntwerpLocation}
@@ -76,10 +80,10 @@ const VeloHeatmap = ({ stations }) => {
       scrollWheelZoom={true}
       className="leaflet-container" // Gebruikt de CSS class vanuit globals.css
     >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
+     <TileLayer
+  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  url="https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png"
+/>
 
       {/* Render de HeatmapLayer component met de voorbereide data */}
       <HeatmapLayer heatmapData={heatmapData} />
