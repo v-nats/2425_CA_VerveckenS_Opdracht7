@@ -1,6 +1,8 @@
 // app/layout.js
-import { GeistSans } from "geist/font/sans";
-import { GeistMono } from "geist/font/mono";
+
+import { Roboto_Mono } from 'next/font/google';
+
+const robotoMono = Roboto_Mono({ subsets: ['latin'] });
 import "./globals.css";
 
 export const metadata = {
@@ -11,7 +13,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="nl">
-      <body className={`${GeistSans.variable} ${GeistMono.variable}`}>
+      <body >
         {children}
       </body>
     </html>

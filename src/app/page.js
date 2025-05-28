@@ -1,37 +1,37 @@
-// app/page.js
-'use client'; // Dit bestand MOET aan de client-side worden gerenderd
+
+'use client'; 
 
 import { useEffect, useState } from 'react';
-import dynamic from 'next/dynamic'; // Importeer next/dynamic voor client-side only rendering
+import dynamic from 'next/dynamic'; 
 
-// Dynamische import van de VeloHeatmap component
+
 
 
 const DynamicVeloHeatmap = dynamic(() => import('./components/VeloHeatmap'), {
-  ssr: false, // Schakel Server-Side Rendering uit voor deze component
-  loading: () => <p>Kaart aan het laden...</p>, // Optionele laadtekst terwijl de kaart laadt
+  ssr: false, 
+  loading: () => <p>Kaart aan het laden...</p>, 
 });
 
-// Hoofdcomponent van de pagina
+
 export default function Home() {
   const [stations, setStations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Coördinaten van het centrum van Antwerpen (bijvoorbeeld Grote Markt)
-    // Je kunt deze aanpassen naar een preciezere locatie als je wilt
-    const centralAntwerpLat = 51.2210; // Breedtegraad van de Grote Markt
-    const centralAntwerpLon = 4.3997;  // Lengtegraad van de Grote Markt
+    
+    
+    const centralAntwerpLat = 51.2210; 
+    const centralAntwerpLon = 4.3997;  
 
-    // Minimale afstand (in kilometers) die tussen de geselecteerde stations moet zijn
-    // Pas deze waarde aan als je een grotere of kleinere spreiding wilt
-    const minDistanceBetweenSelectedStationsKm = 0.75; // Bijvoorbeeld 0.75 km
+    
+    
+    const minDistanceBetweenSelectedStationsKm = 0.75; 
 
-    // Functie om de afstand tussen twee punten te berekenen (Haversine formule)
-    // Dit geeft de afstand in kilometers
+    
+    
     const calculateDistance = (lat1, lon1, lat2, lon2) => {
-        const R = 6371; // Aarde straal in kilometers
+        const R = 6371; 
         const dLat = (lat2 - lat1) * Math.PI / 180;
         const dLon = (lon2 - lon1) * Math.PI / 180;
         const a =
@@ -43,7 +43,7 @@ export default function Home() {
         return distance;
     };
 
-    // Haal de data op van de Velo Antwerpen API
+    
     fetch('https://api.citybik.es/v2/networks/velo-antwerpen')
       .then(res => {
         if (!res.ok) {
@@ -52,7 +52,7 @@ export default function Home() {
         return res.json();
       })
       .then(data => {
-        // Bereken de afstand van elk station tot het centrum van Antwerpen
+        
         const stationsWithDistanceToCenter = data.network.stations.map(station => ({
             ...station,
             distanceToCenter: calculateDistance(
@@ -63,14 +63,14 @@ export default function Home() {
             )
         }));
 
-        // Sorteer alle stations op basis van hun afstand tot het centrum (oplopend)
+        
         stationsWithDistanceToCenter.sort((a, b) => a.distanceToCenter - b.distanceToCenter);
 
         const closestFiveStations = [];
-        // Loop door de gesorteerde stations en selecteer de 5 dichtstbijzijnde die voldoende ver uit elkaar liggen
+        
         for (const station of stationsWithDistanceToCenter) {
           if (closestFiveStations.length >= 5) {
-            break; // We hebben al 5 stations
+            break;
           }
 
           let isTooCloseToExisting = false;
@@ -96,11 +96,11 @@ export default function Home() {
         setLoading(false);
       })
       .catch(e => {
-        console.error('Error fetching data:', e); // Log de fout voor debugging
+        console.error('Error fetching data:', e); 
         setError(e.message);
         setLoading(false);
       });
-  }, []); // Lege dependency array betekent dat dit effect slechts één keer draait bij mount
+  }, []); 
 
   return (
     <main
@@ -128,12 +128,12 @@ export default function Home() {
 )}
       {error && <p style={{ color: 'red' }}>Fout bij het laden van data: {error}</p>}
 
-      {/* Render de dynamisch geladen kaartcomponent zodra data is geladen en er geen fout is */}
+      
       {!loading && !error && (
         <DynamicVeloHeatmap stations={stations} />
       )}
 
-      {/* Weergave van de lijst met de 5 dichtstbijzijnde stations die ook verspreid zijn */}
+      
       {!loading && !error && stations.length > 0 && (
         <div style={{ marginTop: '30px', borderTop: '1px solid #eee', paddingTop: '20px', width: '100%' }}>
           <h2 style={{ fontSize: '22px', marginBottom: '15px', textAlign: 'center' }}>Dichtstbijzijnde Stations (Top 5, verspreid)</h2>

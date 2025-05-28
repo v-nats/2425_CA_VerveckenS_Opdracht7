@@ -1,13 +1,12 @@
-// src/app/components/VeloHeatmap.js
-'use client'; // Deze component MOET een client component zijn
 
-import { useEffect, useMemo, useRef } from 'react'; // useRef toegevoegd
+'use client'; 
+import { useEffect, useMemo, useRef } from 'react'; 
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'; // useMap toegevoegd
-import 'leaflet/dist/leaflet.css'; // Essentieel voor de styling van de kaart
-import L from 'leaflet'; // Importeer L voor de heatmap plugin
-import 'leaflet.heat'; // Importeer de Leaflet.heat plugin
+import 'leaflet/dist/leaflet.css'; 
+import L from 'leaflet'; 
+import 'leaflet.heat'; 
 
-// BELANGRIJKE FIX: Dit lost problemen op met ontbrekende marker-iconen in Leaflet
+
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
@@ -15,16 +14,16 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
 });
 
-// Component om de heatmap laag toe te voegen aan de Leaflet kaart
+
 function HeatmapLayer({ heatmapData }) {
-  const map = useMap(); // Haal de Leaflet map instantie op via useMap hook
+  const map = useMap(); 
 
   useEffect(() => {
     if (!map || heatmapData.length === 0) {
-      return; // Doe niets als de kaart of data ontbreekt
+      return; 
     }
 
-    // Verwijder de vorige heatmap laag als die bestaat
+    
     if (map._heatmapLayer) {
       map.removeLayer(map._heatmapLayer);
     }
@@ -34,29 +33,29 @@ function HeatmapLayer({ heatmapData }) {
         blur: 20,
         maxZoom: 1,
         minOpacity: 0.4,
-        max: 1, // Blijft op 1
+        max: 1, 
         gradient: {
           0.0: 'red', 
-            // 0-20% van max (0-4 fietsen)
-          0.3: 'orange',  // 30% van max (6 fietsen)
-          0.6: 'yellow',  // 60% van max (12 fietsen)
-          0.9: 'green'    // 90% van max (18 fietsen)
+            
+          0.3: 'orange',  
+          0.6: 'yellow',  
+          0.9: 'green'    
         }
       });
 
     heatLayer.addTo(map);
-    map._heatmapLayer = heatLayer; // Sla de laag op in de map instantie voor eenvoudige referentie
+    map._heatmapLayer = heatLayer; 
 
-    // Cleanup functie: verwijder de heatmap laag wanneer de component unmount
+    
     return () => {
       if (map._heatmapLayer) {
         map.removeLayer(map._heatmapLayer);
-        map._heatmapLayer = null; // Verwijder de referentie
+        map._heatmapLayer = null;
       }
     };
-  }, [map, heatmapData]); // Herhaal dit effect wanneer map of heatmapData verandert
+  }, [map, heatmapData]); 
 
-  return null; // Deze component rendert geen UI-elementen direct
+  return null; 
 }
 
 const VeloHeatmap = ({ stations }) => {
@@ -64,14 +63,14 @@ const VeloHeatmap = ({ stations }) => {
   const initialZoom = 13;
 
   const heatmapData = useMemo(() => {
-    const maxBikesPerStation = 19; // pas aan indien nodig
+    const maxBikesPerStation = 19; 
     return stations.map(station => {
       const ratio = station.free_bikes / maxBikesPerStation;
-      const intensity = Math.min(ratio, 1); // cap op 1
+      const intensity = Math.min(ratio, 1); 
       console.log(`Station: ${station.name}, Free Bikes: ${station.free_bikes}, Intensity: ${intensity}`); // <--- VOEG DEZE TOE
       return [station.latitude, station.longitude, intensity];
     });
-    console.log('Final Heatmap Data:', transformedData); // <--- EN DEZE
+    console.log('Final Heatmap Data:', transformedData); 
   }, [stations]);
   
   return (
@@ -79,17 +78,17 @@ const VeloHeatmap = ({ stations }) => {
       center={defaultAntwerpLocation}
       zoom={initialZoom}
       scrollWheelZoom={true}
-      className="leaflet-container" // Gebruikt de CSS class vanuit globals.css
+      className="leaflet-container" 
     >
      <TileLayer
-  attribution="" // Geen attributie nodig voor een lege tegel
+  attribution="" 
   url="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" // Transparante 1x1 GIF
 />
 
-      {/* Render de HeatmapLayer component met de voorbereide data */}
+      {}
       <HeatmapLayer heatmapData={heatmapData} />
 
-      {/* Markers voor elk station met popup-informatie */}
+      
       {stations.map(station => (
         <Marker key={station.id} position={[station.latitude, station.longitude]}>
           <Popup>

@@ -1,14 +1,12 @@
-/* app/globals.css */
 
-/* Standaard CSS reset/basisstijlen */
 
 
 html, body {
   margin: 0;
   padding: 0;
-  height: 100%; /* Zorgt ervoor dat html en body de volledige hoogte innemen */
-  box-sizing: border-box; /* Inclusief padding en border in de totale breedte/hoogte */
-  font-family: var(--font-geist-sans, sans-serif); /* Gebruikt Geist Sans font */
+  height: 100%; 
+  box-sizing: border-box; 
+  font-family: var(--font-geist-sans, sans-serif); 
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   touch-action: manipulation;
@@ -18,10 +16,10 @@ html, body {
 
 
 #__next {
-  height: 100%; /* Nodig voor Next.js app */
+  height: 100%; 
 }
 
-/* Stijl voor de hoofdinhoud van de pagina */
+
 main {
   min-height: 100vh;
   width: 100%;
@@ -29,22 +27,22 @@ main {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px; /* Padding rondom de inhoud */
-  max-width: 1200px; /* Maximale breedte voor de inhoud */
-  margin: 0 auto; /* Centreer de main container */
-  gap: 20px; /* Ruimte tussen directe elementen binnen main */
+  padding: 20px; 
+  max-width: 1200px; 
+  margin: 0 auto; 
+  gap: 20px; 
 }
 
-/* Stijl voor de Leaflet kaartcontainer */
+
 .leaflet-container {
   width: 100%;
-  height: 70vh; /* Cruciale hoogte voor de kaart */
-  border-radius: 8px; /* Afgeronde hoeken */
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1); /* Zachte schaduw */
-  background-color: #f0f0f0; /* Terugvalkleur voor de kaart (lichtgrijs) */
+  height: 70vh; 
+  border-radius: 8px; 
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  background-color: #f0f0f0; 
 }
 
-/* Algemene stijlen voor koppen en paragrafen binnen de main container */
+
 h1 {
   font-size: 28px;
   margin-bottom: 0;
@@ -58,8 +56,8 @@ p {
   text-align: center;
 }
 
-/* Stijlen voor laad- en foutmeldingen */
-p[style*="color: red"] { /* Selecteert p-elementen met inline style color: red */
+
+p[style*="color: red"] { 
   color: red;
   font-weight: bold;
 }
