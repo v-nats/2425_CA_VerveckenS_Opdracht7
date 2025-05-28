@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic'; // Importeer next/dynamic voor client-side only rendering
 
 // Dynamische import van de VeloHeatmap component
+
+
 const DynamicVeloHeatmap = dynamic(() => import('./components/VeloHeatmap'), {
   ssr: false, // Schakel Server-Side Rendering uit voor deze component
   loading: () => <p>Kaart aan het laden...</p>, // Optionele laadtekst terwijl de kaart laadt
@@ -118,7 +120,12 @@ export default function Home() {
         Visualisatie van real-time beschikbare Velo fietsen. Groen = veel fietsen, Rood = weinig fietsen.
       </p>
 
-      {loading && <p>Bezig met laden van Velo Antwerpen data...</p>}
+      {loading && (
+  <div style={{ textAlign: 'center', marginTop: '50px' }}>
+    <div className="spinner" />
+    <p>Velo-data wordt geladen...</p>
+  </div>
+)}
       {error && <p style={{ color: 'red' }}>Fout bij het laden van data: {error}</p>}
 
       {/* Render de dynamisch geladen kaartcomponent zodra data is geladen en er geen fout is */}

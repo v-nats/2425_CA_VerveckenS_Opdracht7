@@ -93,13 +93,22 @@ const VeloHeatmap = ({ stations }) => {
       {stations.map(station => (
         <Marker key={station.id} position={[station.latitude, station.longitude]}>
           <Popup>
-            <b>{station.name}</b> <br />
-            Beschikbare fietsen: {station.free_bikes} <br />
-            Lege plaatsen: {station.empty_slots} <br />
-            <a href={`/station/${station.id}`} style={{ color: '#007bff', textDecoration: 'none' }}>
-              Bekijk details
-            </a>
-          </Popup>
+  <div style={{ fontSize: '14px', lineHeight: '1.4', textAlign: 'center' }}>
+    <strong>{station.name}</strong><br />
+    🚴 {station.free_bikes} fietsen<br />
+    📍 {station.empty_slots} plaatsen<br />
+    <a href={`/station/${station.id}`} style={{
+      display: 'inline-block',
+      marginTop: '8px',
+      padding: '6px 10px',
+      background: '#007bff',
+      color: 'white',
+      borderRadius: '6px',
+      textDecoration: 'none',
+      fontSize: '12px'
+    }}>Details</a>
+  </div>
+</Popup>
         </Marker>
       ))}
     </MapContainer>
